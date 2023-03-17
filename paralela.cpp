@@ -1,14 +1,16 @@
+///Aun en desarrollo
+
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
 #include <vector>
-#include <SDL2/SDL.h>
-
+#include <SDL.h>
+#include <omp.h>
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 const int STAR_SIZE = 2;
-const int MAX_SPEED = 100;
+const int MAX_SPEED = 10;
 const int MAX_NUM_STARS = 10000;
 const int FPS = 60;
 
@@ -27,7 +29,6 @@ int main(int argc, char* argv[]) {
     std::srand(std::time(nullptr));
     Uint32 start_time, end_time, frame_time;
     int frames = 0;
-    
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         std::cerr << "SDL initialization failed: " << SDL_GetError() << '\n';
@@ -65,9 +66,10 @@ int main(int argc, char* argv[]) {
 
     start_time = SDL_GetTicks();
 
+#pragma omp parallel
     {
         while (!quit) {
-
+#pragma omp master
             {
                 while (SDL_PollEvent(&event)) {
                     if (event.type == SDL_QUIT) {
@@ -81,7 +83,7 @@ int main(int argc, char* argv[]) {
             SDL_RenderClear(renderer);
 
             // Update star positions
-
+#pragma omp for
             for (int i = 0; i < stars.size(); ++i) {
                 stars[i].y += stars[i].speed;
                 if (stars[i].y > SCREEN_HEIGHT) {
@@ -91,15 +93,10 @@ int main(int argc, char* argv[]) {
                 }
             }
 
-            
-
+            // Draw stars
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+#pragma omp for
             for (int i = 0; i < stars.size(); ++i) {
-                //Random Color to stars
-                //int random = rand() % 255;
-                
-                // Draw stars
-                SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-                
                 SDL_Rect rect = { stars[i].x, stars[i].y, STAR_SIZE, STAR_SIZE };
                 SDL_RenderFillRect(renderer, &rect);
             }
@@ -108,23 +105,23 @@ int main(int argc, char* argv[]) {
             SDL_RenderPresent(renderer);
 
             // Limit frame rate to 60fps
-
+#pragma omp master
             ++frames;
+        end_time = SDL_GetTicks();
+        frame_time = end_time - start_time;
+
+        if (frame_time < 1000 / FPS) {
+            SDL_Delay(1000 / FPS - frame_time);
             end_time = SDL_GetTicks();
             frame_time = end_time - start_time;
+        }
 
-            if (frame_time < 1000 / FPS) {
-                SDL_Delay(1000 / FPS - frame_time);
-                end_time = SDL_GetTicks();
-                frame_time = end_time - start_time;
-            }
-
-            if (frame_time >= 1000) {
-                int fps = frames * 1000 / frame_time;
-                printf("FPS: %d\n", fps);
-                start_time = end_time;
-                frames = 0;
-            }
+        if (frame_time >= 1000) {
+            int fps = frames * 1000 / frame_time;
+            printf("FPS: %d\n", fps);
+            start_time = end_time;
+            frames = 0;
+        }
         }
     }
 
