@@ -5,6 +5,7 @@
 #include <SDL2/SDL.h>
 #include <algorithm>
 #include <time.h>
+#include <math.h>
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
@@ -101,12 +102,12 @@ int main(int argc, char *argv[])
         Comet comet;
         comet.x = std::rand() % (SCREEN_WIDTH - COMET_SIZE);
         comet.y = std::rand() % (SCREEN_HEIGHT - COMET_SIZE);
-        comet.vx = std::rand() % (MAX_SPEED - MIN_SPEED + 1) + MIN_SPEED;
+        comet.vx = std::rand() % (MIN_SPEED + 1) + MIN_SPEED;
         if (std::rand() % 2 == 0)
         {
             comet.vx = -comet.vx;
         }
-        comet.vy = std::rand() % (MAX_SPEED - MIN_SPEED + 1) + MIN_SPEED;
+        comet.vy = std::rand() % (MIN_SPEED + 1) + MIN_SPEED;
         if (std::rand() % 2 == 0)
         {
             comet.vy = -comet.vy;
@@ -124,26 +125,70 @@ int main(int argc, char *argv[])
             }
         }
 
-        //  create 5 comets with random velocities and positions every second
-        if (comets.size() < 5)
+        //  create 5 comets with random velocities and positions every 5 seconds
+
+        int time_counter = SDL_GetTicks();
+        if (time_counter % 300 == 0)
         {
-            int num_comets = 5;
-            for (int i = 0; i < num_comets; ++i)
+            if (comets.size() < 5)
             {
-                Comet comet;
-                comet.x = std::rand() % (SCREEN_WIDTH - COMET_SIZE);
-                comet.y = std::rand() % (SCREEN_HEIGHT - COMET_SIZE);
-                comet.vx = std::rand() % (MAX_SPEED - MIN_SPEED + 1) + MIN_SPEED;
-                if (std::rand() % 2 == 0)
+                int c = std::rand() % 5;
+                int num_comets = c;
+                for (int i = 0; i < num_comets; ++i)
                 {
-                    comet.vx = -comet.vx;
+                    Comet comet;
+                    int angle = std::rand() % 360;
+                    angle = angle * 3.14159265 / 180;
+                    comet.x = std::rand() % (SCREEN_WIDTH - COMET_SIZE);
+                    comet.y = 0;
+                    comet.vx = std::rand() % (MIN_SPEED) + MIN_SPEED;
+                    comet.vy = std::rand() % (MIN_SPEED) + MIN_SPEED;
+                    if (std::rand() % 2 == 0)
+                    {
+                        comet.vx = comet.vy * tan(angle);
+                    }
+                    // comet.vy = std::rand() % (MIN_SPEED) + MIN_SPEED;
+                    // if (std::rand() % 2 == 0)
+                    // {
+                    //     comet.vy = -comet.vy;
+                    // }
+                    comets.push_back(comet);
                 }
-                comet.vy = std::rand() % (MAX_SPEED - MIN_SPEED + 1) + MIN_SPEED;
-                if (std::rand() % 2 == 0)
-                {
-                    comet.vy = -comet.vy;
-                }
-                comets.push_back(comet);
+            }
+        }
+
+        // if (comets.size() < 5)
+        // {
+        //     int num_comets = 5;
+        //     for (int i = 0; i < num_comets; ++i)
+        //     {
+        //         Comet comet;
+        //         comet.x = std::rand() % (SCREEN_WIDTH - COMET_SIZE);
+        //         comet.y = std::rand() % (SCREEN_HEIGHT - COMET_SIZE);
+        //         comet.vx = std::rand() % (MAX_SPEED - MIN_SPEED + 1) + MIN_SPEED;
+        //         if (std::rand() % 2 == 0)
+        //         {
+        //             comet.vx = -comet.vx;
+        //         }
+        //         comet.vy = std::rand() % (MAX_SPEED - MIN_SPEED + 1) + MIN_SPEED;
+        //         if (std::rand() % 2 == 0)
+        //         {
+        //             comet.vy = -comet.vy;
+        //         }
+        //         comets.push_back(comet);
+        //     }
+        // }
+
+        // Delete comets that have a velocity of 0
+        for (auto it = comets.begin(); it != comets.end();)
+        {
+            if (it->vx == 0 && it->vy == 0)
+            {
+                it = comets.erase(it);
+            }
+            else
+            {
+                ++it;
             }
         }
 
