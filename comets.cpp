@@ -10,8 +10,8 @@
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 const int COMET_SIZE = 10;
-const int MIN_SPEED = 100;
-const int MAX_SPEED = 200;
+const int MIN_SPEED_COMETS = 100;
+const int MAX_SPEED_COMETS = 200;
 const int COLLISION_DISTANCE = COMET_SIZE * 2;
 
 struct Comet
@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
     bool quit = false;
     std::vector<Comet> comets;
     std::srand(std::time(nullptr));
-    Uint32 start_time, end_time, delta_time;
+    Uint32 start_time_comet, end_time_comet, delta_time;
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
@@ -103,12 +103,12 @@ int main(int argc, char *argv[])
         Comet comet;
         comet.x = std::rand() % (SCREEN_WIDTH - COMET_SIZE);
         comet.y = std::rand() % (SCREEN_HEIGHT - COMET_SIZE);
-        comet.vx = std::rand() % (MIN_SPEED + 1) + MIN_SPEED;
+        comet.vx = std::rand() % (MIN_SPEED_COMETS + 1) + MIN_SPEED_COMETS;
         if (std::rand() % 2 == 0)
         {
             comet.vx = -comet.vx;
         }
-        comet.vy = std::rand() % (MIN_SPEED + 1) + MIN_SPEED;
+        comet.vy = std::rand() % (MIN_SPEED_COMETS + 1) + MIN_SPEED_COMETS;
         if (std::rand() % 2 == 0)
         {
             comet.vy = -comet.vy;
@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
         comets.push_back(comet);
     }
 
-    start_time = SDL_GetTicks();
+    start_time_comet = SDL_GetTicks();
     while (!quit)
     {
         while (SDL_PollEvent(&event))
@@ -143,8 +143,8 @@ int main(int argc, char *argv[])
                     angle = angle * 3.14159265 / 180;
                     comet.x = std::rand() % (SCREEN_WIDTH - COMET_SIZE);
                     comet.y = 0;
-                    comet.vx = std::rand() % (MAX_SPEED - MIN_SPEED + 1) + MIN_SPEED;
-                    comet.vy = std::rand() % (MAX_SPEED - MIN_SPEED + 1) + MIN_SPEED;
+                    comet.vx = std::rand() % (MAX_SPEED_COMETS - MIN_SPEED_COMETS + 1) + MIN_SPEED_COMETS;
+                    comet.vy = std::rand() % (MAX_SPEED_COMETS - MIN_SPEED_COMETS + 1) + MIN_SPEED_COMETS;
                     if (std::rand() % 2 == 0)
                     {
                         comet.vx = comet.vy * tan(angle);
@@ -167,9 +167,9 @@ int main(int argc, char *argv[])
             }
         }
 
-        end_time = SDL_GetTicks();
-        delta_time = end_time - start_time;
-        start_time = end_time;
+        end_time_comet = SDL_GetTicks();
+        delta_time = end_time_comet - start_time_comet;
+        start_time_comet = end_time_comet;
         for (auto &comet : comets)
         {
             // check fps and update comet position accordingly to keep speed constant
