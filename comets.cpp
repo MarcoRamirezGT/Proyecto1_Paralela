@@ -10,8 +10,8 @@
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 const int COMET_SIZE = 10;
-const int MIN_SPEED = 1;
-const int MAX_SPEED = 2;
+const int MIN_SPEED = 100;
+const int MAX_SPEED = 200;
 const int COLLISION_DISTANCE = COMET_SIZE * 2;
 
 struct Comet
@@ -66,6 +66,7 @@ int main(int argc, char *argv[])
     bool quit = false;
     std::vector<Comet> comets;
     std::srand(std::time(nullptr));
+    Uint32 start_time, end_time, delta_time;
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
@@ -115,6 +116,7 @@ int main(int argc, char *argv[])
         comets.push_back(comet);
     }
 
+    start_time = SDL_GetTicks();
     while (!quit)
     {
         while (SDL_PollEvent(&event))
@@ -141,43 +143,16 @@ int main(int argc, char *argv[])
                     angle = angle * 3.14159265 / 180;
                     comet.x = std::rand() % (SCREEN_WIDTH - COMET_SIZE);
                     comet.y = 0;
-                    comet.vx = std::rand() % (MIN_SPEED) + MIN_SPEED;
-                    comet.vy = std::rand() % (MIN_SPEED) + MIN_SPEED;
+                    comet.vx = std::rand() % (MAX_SPEED - MIN_SPEED + 1) + MIN_SPEED;
+                    comet.vy = std::rand() % (MAX_SPEED - MIN_SPEED + 1) + MIN_SPEED;
                     if (std::rand() % 2 == 0)
                     {
                         comet.vx = comet.vy * tan(angle);
                     }
-                    // comet.vy = std::rand() % (MIN_SPEED) + MIN_SPEED;
-                    // if (std::rand() % 2 == 0)
-                    // {
-                    //     comet.vy = -comet.vy;
-                    // }
                     comets.push_back(comet);
                 }
             }
         }
-
-        // if (comets.size() < 5)
-        // {
-        //     int num_comets = 5;
-        //     for (int i = 0; i < num_comets; ++i)
-        //     {
-        //         Comet comet;
-        //         comet.x = std::rand() % (SCREEN_WIDTH - COMET_SIZE);
-        //         comet.y = std::rand() % (SCREEN_HEIGHT - COMET_SIZE);
-        //         comet.vx = std::rand() % (MAX_SPEED - MIN_SPEED + 1) + MIN_SPEED;
-        //         if (std::rand() % 2 == 0)
-        //         {
-        //             comet.vx = -comet.vx;
-        //         }
-        //         comet.vy = std::rand() % (MAX_SPEED - MIN_SPEED + 1) + MIN_SPEED;
-        //         if (std::rand() % 2 == 0)
-        //         {
-        //             comet.vy = -comet.vy;
-        //         }
-        //         comets.push_back(comet);
-        //     }
-        // }
 
         // Delete comets that have a velocity of 0
         for (auto it = comets.begin(); it != comets.end();)
@@ -192,11 +167,16 @@ int main(int argc, char *argv[])
             }
         }
 
-        // Update comet positions
+        end_time = SDL_GetTicks();
+        delta_time = end_time - start_time;
+        start_time = end_time;
         for (auto &comet : comets)
         {
-            comet.x += comet.vx;
-            comet.y += comet.vy;
+            // check fps and update comet position accordingly to keep speed constant
+            comet.x += comet.vx * delta_time / 100;
+            comet.y += comet.vy * delta_time / 100;
+            // comet.x += comet.vx;
+            // comet.y += comet.vy;
             if (comet.x < 0 || comet.x > SCREEN_WIDTH - COMET_SIZE)
             {
                 comet.vx = -comet.vx;
