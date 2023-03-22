@@ -10,12 +10,12 @@
 // Datos de estrellas
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
-const int STAR_SIZE = 1;
+const int STAR_SIZE = 2;
 const int MAX_SPEED = 100;
-const int MAX_NUM_STARS = 100;
+// const int MAX_NUM_STARS = 1000;
 const int FPS = 60;
 // Datos de cometas
-const int COMET_SIZE = 20;
+const int COMET_SIZE = 30;
 const int MIN_SPEED_COMETS = 100;
 const int MAX_SPEED_COMETS = 200;
 const int COLLISION_DISTANCE = COMET_SIZE * 2;
@@ -37,6 +37,8 @@ struct Comet
     int vy;
 };
 
+// Funciones
+// Determinar la colision de dos cometas
 bool check_collision(const Comet &comet1, const Comet &comet2)
 {
     SDL_Rect rect1 = {comet1.x, comet1.y, COMET_SIZE, COMET_SIZE};
@@ -44,6 +46,7 @@ bool check_collision(const Comet &comet1, const Comet &comet2)
     return SDL_HasIntersection(&rect1, &rect2) == SDL_TRUE;
 }
 
+// Manejar la colision de dos cometas
 void handle_collision(Comet &comet1, Comet &comet2)
 {
     int dx = comet1.x - comet2.x;
@@ -73,6 +76,7 @@ void handle_collision(Comet &comet1, Comet &comet2)
     }
 }
 
+// Dibujar un circulo
 void DrawCircle(SDL_Renderer *renderer, int32_t centreX, int32_t centreY, int32_t radius)
 {
     const int32_t diameter = (radius * 2);
@@ -111,6 +115,7 @@ void DrawCircle(SDL_Renderer *renderer, int32_t centreX, int32_t centreY, int32_
     }
 }
 
+// Main
 int main(int argc, char *argv[])
 {
     SDL_Window *window = nullptr;
@@ -124,19 +129,40 @@ int main(int argc, char *argv[])
     Uint32 start_time_comet, end_time_comet, delta_time;
 
     int frames = 0;
+    int MAX_NUM_STARS = 0;
+    int num_comets = 0;
+    std::cout << "Ingrese la cantidad de estrellas: ";
+    while (!(std::cin >> MAX_NUM_STARS) || MAX_NUM_STARS < 0)
+    {
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::cout << "El valor ingresado no es valido. Ingrese la cantidad de estrellas (solo se permite numeros mayores a 0): ";
+    }
+    std::cout << "El numero de estrellas ingresadas es: " << MAX_NUM_STARS << "\n";
 
+    std::cout << "Ingrese la cantidad de cometas: ";
+    while (!(std::cin >> num_comets) || num_comets < 0)
+    {
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::cout << "El valor ingresado no es valido. Ingrese la cantidad de cometas (solo se permite numeros mayores a 0): ";
+    }
+    std::cout << "El numero de cometas ingresadas es: " << num_comets << "\n";
+
+    // Inicializar SDL
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
         std::cerr << "SDL initialization failed: " << SDL_GetError() << '\n';
         return 1;
     }
-
+    // Crear ventana
     window = SDL_CreateWindow("Screensaver",
                               SDL_WINDOWPOS_UNDEFINED,
                               SDL_WINDOWPOS_UNDEFINED,
                               SCREEN_WIDTH,
                               SCREEN_HEIGHT,
                               SDL_WINDOW_SHOWN);
+    // Comprobar errores
     if (window == nullptr)
     {
         std::cerr << "Window creation failed: " << SDL_GetError() << '\n';
@@ -153,7 +179,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    // Create initial stars
+    // Crear las estrellas iniciales
     for (int i = 0; i < MAX_NUM_STARS; ++i)
     {
         Star star;
@@ -163,7 +189,7 @@ int main(int argc, char *argv[])
         stars.push_back(star);
     }
     // Create N comets with random positions and velocities
-    int num_comets = 10;
+
     for (int i = 0; i < num_comets; ++i)
     {
         Comet comet;
@@ -198,8 +224,8 @@ int main(int argc, char *argv[])
             }
 
             // Clear screen
-            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-            SDL_RenderClear(renderer);
+            // SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+            // SDL_RenderClear(renderer);
             //  create 5 comets with random velocities and positions every 5 seconds
 
             int time_counter = SDL_GetTicks();
@@ -314,7 +340,8 @@ int main(int argc, char *argv[])
                 // int random = rand() % 255;
 
                 // Draw stars
-                SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+                SDL_SetRenderDrawColor(renderer, rand() % 255, rand() % 255, 255, 255);
 
                 SDL_Rect rect = {stars[i].x, stars[i].y, STAR_SIZE, STAR_SIZE};
                 SDL_RenderFillRect(renderer, &rect);
