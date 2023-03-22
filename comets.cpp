@@ -9,7 +9,7 @@
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
-const int COMET_SIZE = 10;
+const int COMET_SIZE = 15;
 const int MIN_SPEED_COMETS = 100;
 const int MAX_SPEED_COMETS = 200;
 const int COLLISION_DISTANCE = COMET_SIZE * 2;
@@ -56,6 +56,60 @@ void handle_collision(Comet &comet1, Comet &comet2)
             comet2.vx += vy2_perp;
         }
     }
+}
+
+void DrawCircle(SDL_Renderer *renderer, int32_t centreX, int32_t centreY, int32_t radius)
+{
+    const int32_t diameter = (radius * 2);
+
+    int32_t x = (radius - 1);
+    int32_t y = 0;
+    int32_t tx = 1;
+    int32_t ty = 1;
+    int32_t error = (tx - diameter);
+
+    while (x >= y)
+    {
+        //  Each of the following renders an octant of the circle
+        SDL_RenderDrawPoint(renderer, centreX + x, centreY - y);
+        SDL_RenderDrawPoint(renderer, centreX + x, centreY + y);
+        SDL_RenderDrawPoint(renderer, centreX - x, centreY - y);
+        SDL_RenderDrawPoint(renderer, centreX - x, centreY + y);
+        SDL_RenderDrawPoint(renderer, centreX + y, centreY - x);
+        SDL_RenderDrawPoint(renderer, centreX + y, centreY + x);
+        SDL_RenderDrawPoint(renderer, centreX - y, centreY - x);
+        SDL_RenderDrawPoint(renderer, centreX - y, centreY + x);
+
+        if (error <= 0)
+        {
+            ++y;
+            error += ty;
+            ty += 2;
+        }
+
+        if (error > 0)
+        {
+            --x;
+            tx += 2;
+            error += (tx - diameter);
+        }
+    }
+}
+
+void DrawComet(SDL_Renderer *renderer, int32_t centreX, int32_t centreY, int32_t radius, int32_t tailLength, int32_t tailWidth)
+{
+    // Calculate the position of the comet's tail
+    int32_t tailX = centreX - radius - tailLength;
+    int32_t tailY = centreY - tailWidth / 2;
+
+    // Draw the rectangles for the comet's tail
+    SDL_Rect tailRect = {tailX, tailY, tailLength, tailWidth};
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_RenderFillRect(renderer, &tailRect);
+
+    // Draw the circle for the comet's head
+    SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
+    DrawCircle(renderer, centreX, centreY, radius);
 }
 
 int main(int argc, char *argv[])
@@ -216,8 +270,7 @@ int main(int argc, char *argv[])
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         for (const auto &comet : comets)
         {
-            SDL_Rect rect = {comet.x, comet.y, COMET_SIZE, COMET_SIZE};
-            SDL_RenderFillRect(renderer, &rect);
+            DrawCircle(renderer, comet.x + COMET_SIZE / 2, comet.y + COMET_SIZE / 2, COMET_SIZE / 2);
         }
         SDL_RenderPresent(renderer);
     }
