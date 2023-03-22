@@ -8,18 +8,27 @@
 #include <math.h>
 #include <omp.h>
 
-// Datos de estrellas
+// Ancho de la ventana
 const int SCREEN_WIDTH = 640;
+// Altura de la ventana
 const int SCREEN_HEIGHT = 480;
+// Tamaño de las estrellas
 const int STAR_SIZE = 2;
+// Velocidad maxima de las estrellas
 const int MAX_SPEED = 100;
-// const int MAX_NUM_STARS = 1000;
+// FPS
 const int FPS = 60;
 // Datos de cometas
+// Tamaño de las cometas
 const int COMET_SIZE = 30;
+// Velocidad minima de las cometas
 const int MIN_SPEED_COMETS = 100;
+// Velocidad maxima de las cometas
 const int MAX_SPEED_COMETS = 200;
+// Distancia de colision
 const int COLLISION_DISTANCE = COMET_SIZE * 2;
+// Numero de hilos
+const int N_threads = 12;
 
 // Estructura de estrella
 struct Star
@@ -123,16 +132,25 @@ int main(int argc, char *argv[])
     SDL_Renderer *renderer = nullptr;
     SDL_Event event;
     bool quit = false;
+    // Vector de estrellas
     std::vector<Star> stars;
+    // Vector de cometas
     std::vector<Comet> comets;
+    // srand para generar numeros aleatorios
     std::srand(std::time(nullptr));
+    // Variables para el tiempo del programa
     Uint32 start_time, end_time, frame_time;
+    // VARIABLES PARA EL TIEMPO DE COMETAS
     Uint32 start_time_comet, end_time_comet, delta_time;
 
+    // Frames
     int frames = 0;
+    // Maximo numero de estrellas
     int MAX_NUM_STARS = 0;
+    // Numero de cometas
     int num_comets = 0;
-    int N_threads = 16;
+
+    // Programacion defensiva de la entrada de datos
     std::cout << "Ingrese la cantidad de estrellas: ";
     while (!(std::cin >> MAX_NUM_STARS) || MAX_NUM_STARS < 0)
     {
@@ -231,9 +249,8 @@ int main(int argc, char *argv[])
             }
 
             // Clear screen
-            // SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-            // SDL_RenderClear(renderer);
-            //  create 5 comets with random velocities and positions every 5 seconds
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+            SDL_RenderClear(renderer);
 
             int time_counter = SDL_GetTicks();
             if (time_counter % 300 == 0)
@@ -243,6 +260,7 @@ int main(int argc, char *argv[])
                     int c = std::rand() % 5;
                     int num_comets = c;
                     int angle = 0;
+
 #pragma omp parallel for num_threads(N_threads) private(angle)
                     for (int i = 0; i < num_comets; ++i)
                     {

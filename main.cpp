@@ -8,16 +8,23 @@
 #include <math.h>
 
 // Datos de estrellas
+// Anchura y altura de la pantalla
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
+// Tamaño de estrella
 const int STAR_SIZE = 2;
+// Velocidad máxima de estrella
 const int MAX_SPEED = 100;
-// const int MAX_NUM_STARS = 1000;
+// FPS
 const int FPS = 60;
 // Datos de cometas
+// Tamaño de cometa
 const int COMET_SIZE = 30;
+// Velocidad mínima de cometa
 const int MIN_SPEED_COMETS = 100;
+// Velocidad máxima de cometa
 const int MAX_SPEED_COMETS = 200;
+// Distancia de colisión
 const int COLLISION_DISTANCE = COMET_SIZE * 2;
 
 // Estructura de estrella
@@ -122,15 +129,23 @@ int main(int argc, char *argv[])
     SDL_Renderer *renderer = nullptr;
     SDL_Event event;
     bool quit = false;
+    // Vector de estrellas
     std::vector<Star> stars;
+    // Vector de cometas
     std::vector<Comet> comets;
+    // Inicializar generador de numeros aleatorios
     std::srand(std::time(nullptr));
+    // Variables de tiempo
     Uint32 start_time, end_time, frame_time;
+    // Variables de tiempo de cometas
     Uint32 start_time_comet, end_time_comet, delta_time;
-
+    // frames
     int frames = 0;
+    // maximo de estrellas
     int MAX_NUM_STARS = 0;
+    // maximo de cometas
     int num_comets = 0;
+    // Programacion defensiva
     std::cout << "Ingrese la cantidad de estrellas: ";
     while (!(std::cin >> MAX_NUM_STARS) || MAX_NUM_STARS < 0)
     {
@@ -224,8 +239,8 @@ int main(int argc, char *argv[])
             }
 
             // Clear screen
-            // SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-            // SDL_RenderClear(renderer);
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+            SDL_RenderClear(renderer);
             //  create 5 comets with random velocities and positions every 5 seconds
 
             int time_counter = SDL_GetTicks();
