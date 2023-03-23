@@ -255,14 +255,14 @@ int main(int argc, char *argv[])
             int time_counter = SDL_GetTicks();
             if (time_counter % 300 == 0)
             {
-                if (comets.size() < 5)
+                if (comets.size() < num_comets)
                 {
-                    int c = std::rand() % 5;
-                    int num_comets = c;
+                    int c = std::rand() % num_comets;
+                    // int num_comets = c;
                     int angle = 0;
 
 #pragma omp parallel for num_threads(N_threads) private(angle)
-                    for (int i = 0; i < num_comets; ++i)
+                    for (int i = 0; i < c; ++i)
                     {
                         Comet comet;
                         angle = std::rand() % 360;
