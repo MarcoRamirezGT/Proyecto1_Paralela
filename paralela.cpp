@@ -317,6 +317,7 @@ int main(int argc, char *argv[])
             }
 
             // Check for collisions and handle collided comets
+
             for (int i = 0; i < comets.size(); ++i)
             {
                 for (int j = i + 1; j < comets.size(); ++j)
