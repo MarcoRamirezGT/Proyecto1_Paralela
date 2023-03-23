@@ -1,6 +1,10 @@
 # Proyecto1_Paralela
 Screensaver with openMP
 
+Se debe tener los siguientes packetes para poder correr los programas:
+* SDL2
+* OpenMP (Para el programa paralelo)
+
 Para compilar el programa en secuencial basta con correr el make
 ```ssh
 make
