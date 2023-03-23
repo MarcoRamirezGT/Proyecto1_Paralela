@@ -28,7 +28,7 @@ const int MAX_SPEED_COMETS = 200;
 // Distancia de colision
 const int COLLISION_DISTANCE = COMET_SIZE * 2;
 // Numero de hilos
-const int N_threads = 12;
+const int N_threads = 8;
 
 // Estructura de estrella
 struct Star
@@ -200,7 +200,7 @@ int main(int argc, char *argv[])
     }
 
 // Crear las estrellas iniciales
-#pragma omp parallel for num_threads(N_threads)
+#pragma omp parallel for num_threads(N_threads) shared(stars) // Crear las estrellas iniciales
     for (int i = 0; i < MAX_NUM_STARS; ++i)
     {
         Star star;
@@ -212,7 +212,7 @@ int main(int argc, char *argv[])
     }
 
     // Create N comets with random positions and velocities
-#pragma omp parallel for num_threads(N_threads)
+#pragma omp parallel for num_threads(N_threads) shared(comets) // Crear las estrellas iniciales
     for (int i = 0; i < num_comets; ++i)
     {
         Comet comet;
